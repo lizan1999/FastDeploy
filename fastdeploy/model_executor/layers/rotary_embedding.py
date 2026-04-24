@@ -122,7 +122,7 @@ class GlmRotaryEmbedding:
         # Load pre-computed cos/sin cache from numpy file.
         # cache_data is stored as uint16 but actually represents bfloat16 data.
         # Reinterpret bytes directly without any value conversion.
-        cache_path = "../xvllm/zpy_log/cos_sin_cache_hs128_rd64_mp131072_base1000000_neox1_140308731441648.npy"
+        cache_path = "/ssd3_models/lizan03/scripts/glm/sin_cos/cos_sin_cache_hs128_rd64_mp131072_base1000000_neox1_140308731441648.npy"
         cache_data = np.load(cache_path)
         cache_tensor = paddle.to_tensor(cache_data).view(paddle.bfloat16).reshape(rot_emb.shape)
         paddle.assign(cache_tensor, rot_emb)

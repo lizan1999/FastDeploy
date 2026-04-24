@@ -121,6 +121,9 @@ def top_k_top_p_sampling(
                 )
 
                 _, ids = native_top_p_sampling(x, top_p)
+            elif current_platform.is_xpu():
+                ids = _xpu_top_p_sampling_from_probs(x, top_p, topp_seed)
+                _ = None
             else:
                 if topp_seed is not None:
                     topp_seed_device = paddle.empty(shape=topp_seed.shape, dtype=topp_seed.dtype)
@@ -230,3 +233,33 @@ def min_p_sampling(
             invalid_token_mask = probs < adjusted_min_p.reshape([-1, 1])
             probs = paddle.where(invalid_token_mask, paddle.full_like(probs, 0.0), probs)
         return probs
+
+
+def _xpu_top_p_sampling_from_probs(
+    probs: paddle.Tensor,
+    top_p: paddle.Tensor,
+    topp_seed: Optional[paddle.Tensor] = None,
+) -> paddle.Tensor:
+    """Call infer_ops::top_p_sampling_from_probs via XPU custom op."""
+    from fastdeploy.model_executor.ops.xpu import top_p_sampling_from_probs_xpu
+
+    # Ensure probs is float32 (infer_ops only instantiates <float, int32_t>)
+    if probs.dtype != paddle.float32:
+        probs = probs.cast(paddle.float32)
+    if top_p.dtype != paddle.float32:
+        top_p = top_p.cast(paddle.float32)
+
+    philox_seed = int(topp_seed.item()) if topp_seed is not None and topp_seed.numel() == 1 else 0
+    philox_offset = 0
+
+    output = top_p_sampling_from_probs_xpu(
+        probs,
+        top_p,
+        1.0,        # top_p_val (use top_p_arr per-row, set scalar to 1.0)
+        True,       # deterministic
+        0,
+        philox_offset,
+        0,          # topk
+    )
+    # infer_ops returns int32, downstream expects int64
+    return output.cast(paddle.int64)

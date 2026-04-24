@@ -299,8 +299,15 @@ void split_kvcache_encoder(api::Context* xpu_ctx,
       auto positions_tensor =
           paddle::empty({token_num}, paddle::DataType::INT64, qkv.place());
       std::vector<int64_t> positions_host(token_num);
-      for (int64_t i = 0; i < token_num; i++) {
-        positions_host[i] = static_cast<int64_t>(i);
+      int64_t pos = 0;
+      assert(token_num == seq_lod.cpu[batch_size]);
+      for (int b = 0; b < batch_size; b++) {
+        int64_t len = seq_lod.cpu[b + 1] - seq_lod.cpu[b];
+        int64_t start = start_tokens.cpu[b];
+        for (int64_t i = pos; i < pos + len; i++) {
+            positions_host[i] = static_cast<int64_t>(i - pos + start);
+        }
+        pos += len;
       }
       ret = api::do_host2device(xpu_ctx,
                                 positions_host.data(),

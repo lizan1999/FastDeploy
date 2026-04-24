@@ -210,7 +210,17 @@ def xpu_pre_process(
     xpu_forward_meta.enc_batch = xpu_forward_meta.len_info_cpu[0]
     xpu_forward_meta.dec_batch = xpu_forward_meta.len_info_cpu[1]
     xpu_forward_meta.total_enc_len = xpu_forward_meta.len_info_cpu[2]
+    # print("------------000------------")
+    # print(xpu_forward_meta.len_info_cpu)
+    # print(xpu_forward_meta.decoder_context_len[0].item())
 
+    # step = xpu_forward_meta.decoder_context_len[0].item()
+    # print(step)
+    # if (step > 843 and step < 850):
+    #     paddle.device.xpu.set_debug_level(0xb1)
+
+    # if xpu_forward_meta.len_info_cpu[3] > 600 and xpu_forward_meta.len_info_cpu[3] < 700:
+    #     paddle.device.xpu.set_debug_level(0xb1)
     adjusted_input = adjust_batch(
         ids_remove_padding.reshape([-1, 1]),
         xpu_forward_meta.encoder_seq_lod,

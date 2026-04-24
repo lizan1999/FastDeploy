@@ -81,6 +81,7 @@ std::vector<paddle::Tensor> AdjustBatchKernel(
         dim);
     PD_CHECK(r == 0, "XPU eb_adjust_batch failed");
   }
+  ctx->set_debug_level(0);
   return {out};
 }
 

@@ -161,34 +161,34 @@ def xpu_setup_ops():
         THIRD_PARTY_PATH = os.path.join(current_file.parent, "third_party")
         XHPC_PATH = os.path.join(THIRD_PARTY_PATH, "xhpc-ubuntu2004_x86_64")
 
-        if os.path.exists(XHPC_PATH):
-            with open(os.path.join(XHPC_PATH, "version.txt")) as f:
-                date_line = [line.strip() for line in f.readlines() if "Date:" in line][0]
-                LOCAL_VERSION = f"dev/{date_line.split()[1]}"
-                if LOCAL_VERSION == XHPC_VERSION:
-                    print("Local XHPC exists, skip downloading it again.")
-                else:
-                    XHPC_UPDATE_POLICY_ENV = os.getenv("XHPC_UPDATE_POLICY")
-                    if XHPC_UPDATE_POLICY_ENV is not None:
-                        if XHPC_UPDATE_POLICY_ENV == "FORCE":
-                            print("Forced update detected, downloading new XHPC.")
-                            download_and_extract(XHPC_URL, THIRD_PARTY_PATH)
-                        elif XHPC_UPDATE_POLICY_ENV == "SKIP":
-                            print("Skipped updating XHPC.")
-                        else:
-                            raise Exception(
-                                f"\033[91mInvalid value for environment variable XHPC_UPDATE_POLICY\033[0m: {XHPC_UPDATE_POLICY_ENV}, "
-                                f"Valid environment values are FORCE or SKIP.",
-                            )
-                    else:
-                        raise Exception(
-                            f"\033[91mLocal XHPC version mismatch\033[0m, expected {XHPC_VERSION}, found {LOCAL_VERSION} in {XHPC_PATH}. "
-                            f"\nPlease set environment XHPC_UPDATE_POLICY and rebuild FastDeploy. "
-                            f"\nexport XHPC_UPDATE_POLICY=FORCE for downloading version({XHPC_VERSION}) with force. "
-                            f"\nexport XHPC_UPDATE_POLICY=SKIP for using local version({LOCAL_VERSION}).",
-                        )
-        else:
-            download_and_extract(XHPC_URL, THIRD_PARTY_PATH)
+        # if os.path.exists(XHPC_PATH):
+        #     with open(os.path.join(XHPC_PATH, "version.txt")) as f:
+        #         date_line = [line.strip() for line in f.readlines() if "Date:" in line][0]
+        #         LOCAL_VERSION = f"dev/{date_line.split()[1]}"
+        #         if LOCAL_VERSION == XHPC_VERSION:
+        #             print("Local XHPC exists, skip downloading it again.")
+        #         else:
+        #             XHPC_UPDATE_POLICY_ENV = os.getenv("XHPC_UPDATE_POLICY")
+        #             if XHPC_UPDATE_POLICY_ENV is not None:
+        #                 if XHPC_UPDATE_POLICY_ENV == "FORCE":
+        #                     print("Forced update detected, downloading new XHPC.")
+        #                     download_and_extract(XHPC_URL, THIRD_PARTY_PATH)
+        #                 elif XHPC_UPDATE_POLICY_ENV == "SKIP":
+        #                     print("Skipped updating XHPC.")
+        #                 else:
+        #                     raise Exception(
+        #                         f"\033[91mInvalid value for environment variable XHPC_UPDATE_POLICY\033[0m: {XHPC_UPDATE_POLICY_ENV}, "
+        #                         f"Valid environment values are FORCE or SKIP.",
+        #                     )
+        #             else:
+        #                 raise Exception(
+        #                     f"\033[91mLocal XHPC version mismatch\033[0m, expected {XHPC_VERSION}, found {LOCAL_VERSION} in {XHPC_PATH}. "
+        #                     f"\nPlease set environment XHPC_UPDATE_POLICY and rebuild FastDeploy. "
+        #                     f"\nexport XHPC_UPDATE_POLICY=FORCE for downloading version({XHPC_VERSION}) with force. "
+        #                     f"\nexport XHPC_UPDATE_POLICY=SKIP for using local version({LOCAL_VERSION}).",
+        #                 )
+        # else:
+        #     download_and_extract(XHPC_URL, THIRD_PARTY_PATH)
 
         XDNN_PATH = os.path.join(XHPC_PATH, "xdnn")
 
